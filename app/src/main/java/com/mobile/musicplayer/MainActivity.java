@@ -129,8 +129,16 @@ public class MainActivity extends AppCompatActivity {
         downloadmanager.enqueue(request);
         String fileURl= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/" + trackName + ".m4a";
 
-        mediaPlayer = MediaPlayer.create(this, Uri.parse(fileURl));
-        mediaPlayer.start();
+        tryUntilDownloaded(fileURl);
 
+    }
+
+    public void tryUntilDownloaded(String fileUrl){
+        try{
+            mediaPlayer = MediaPlayer.create(this, Uri.parse(fileUrl));
+            mediaPlayer.start();
+        }catch (Exception e){
+            tryUntilDownloaded(fileUrl);
+        }
     }
 }
