@@ -1,5 +1,7 @@
 package com.mobile.musicplayer;
 
+import static android.os.Environment.DIRECTORY_DOWNLOADS;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DownloadManager;
@@ -121,11 +123,11 @@ public class MainActivity extends AppCompatActivity {
         Uri uri = Uri.parse(url);
 
         DownloadManager.Request request = new DownloadManager.Request(uri);
-        request.setTitle("My File");
+        request.setTitle(trackName);
         request.setDescription("Downloading");//request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,trackName + ".m4a");
+        request.setDestinationInExternalPublicDir(DIRECTORY_DOWNLOADS,trackName + ".m4a");
         downloadmanager.enqueue(request);
-        String fileURl= "/storage/emulated/0/Download/" + trackName + ".m4a";
+        String fileURl= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/" + trackName + ".m4a";
 
         mediaPlayer = MediaPlayer.create(this, Uri.parse(fileURl));
         mediaPlayer.start();
