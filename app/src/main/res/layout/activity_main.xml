@@ -20,7 +20,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_weight="0dp"
             android:orientation="vertical">
 
             <TextView
@@ -36,7 +35,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_weight="0dp"
             android:orientation="vertical">
 
             <com.google.android.material.textfield.TextInputLayout
@@ -56,7 +54,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_weight="0dp"
             android:orientation="vertical">
 
             <Button
@@ -70,7 +67,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="0dp"
             android:orientation="vertical"></LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
