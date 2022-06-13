@@ -4,6 +4,7 @@ public class Result {
     private String artistName;
     private String trackName;
     private String artworkUrl100;
+    private String previewUrl;
 
     public String getArtistName() {
         return artistName;
@@ -27,5 +28,13 @@ public class Result {
 
     public void setArtworkUrl100(String artworkUrl100) {
         this.artworkUrl100 = artworkUrl100;
+    }
+
+    public String getPreviewUrl() {
+        return previewUrl;
+    }
+
+    public void setPreviewUrl(String previewUrl) {
+        this.previewUrl = previewUrl;
     }
 }

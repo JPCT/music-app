@@ -7,16 +7,27 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 import com.mobile.musicplayer.model.Root;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import cafsoft.foundation.HTTPURLResponse;
+import cafsoft.foundation.URLComponents;
 import cafsoft.foundation.URLSession;
 
 public class MainActivity extends AppCompatActivity {
@@ -24,7 +35,11 @@ public class MainActivity extends AppCompatActivity {
     private MusicService musicService;
     private MediaPlayer mediaPlayer;
     private Root root;
-    ListView l;
+
+    private Button btnSearch;
+    private ListView list;
+    private TextInputEditText textInputLayout;
+
     String tutorials[]
             = { "Algorithms", "Data Structures",
             "Languages", "Interview Corner",
@@ -36,35 +51,67 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        String root = getExternalFilesDir(Environment.DIRECTORY_MUSIC).toString();
-
-        String imageFolderPath = root;
-        File imagesFolder = new File(imageFolderPath);
 
         musicService = new MusicService();
         //startActivity(new Intent(MainActivity.this, MainActivity2.class));
 
-
+        initViews();
+        initEvents();
     }
 
     public void initViews(){
-
+        textInputLayout = findViewById(R.id.InputNameMusic);
+        btnSearch = findViewById(R.id.button);
     }
 
     public void initEvents(){
+        btnSearch.setOnClickListener(view -> search());
+    }
 
+    private void search() {
+        String term = textInputLayout.getText().toString();
+        launchSecondView(term);
     }
 
     public void launchSecondView(String term){
         setContentView(R.layout.activity_main2);
-        l = (ListView) findViewById(R.id.songList);
-        ArrayAdapter<String> arr = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, tutorials);
-        l.setAdapter(arr);
+        list = (ListView) findViewById(R.id.songList);
+
+        search(term);
+        while (root == null){
+
+        }
+
+        List<String> tracks = root.getResults().stream()
+                .map(result -> result.getTrackName())
+                .collect(Collectors.toList());
+        ArrayAdapter<String> arr = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, tracks);
+        list.setAdapter(arr);
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                Toast.makeText(getApplicationContext(),
+                        "Click ListItem Number " + position, Toast.LENGTH_LONG)
+                        .show();
+                String rootPath = getExternalFilesDir(Environment.DIRECTORY_MUSIC).toString();
+
+                URLComponents components = new URLComponents(root.getResults().get(position).getPreviewUrl());
+                URL url = null;
+                try {
+                    url = new URL(root.getResults().get(position).getPreviewUrl());
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+                openLoadAudioFile(url, rootPath);
+            }
+        });
     }
 
     public void search(String term){
         musicService.searchSongsByTerm(term, 50, ((isNetworkError, statusCode, response) -> {
-            if (!isNetworkError){
+            if (isNetworkError){
 
             }else if (statusCode != 200){
 
