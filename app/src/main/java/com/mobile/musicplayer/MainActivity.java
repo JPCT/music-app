@@ -2,6 +2,8 @@ package com.mobile.musicplayer;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.DownloadManager;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -53,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         musicService = new MusicService();
-        //startActivity(new Intent(MainActivity.this, MainActivity2.class));
 
         initViews();
         initEvents();
@@ -93,18 +94,11 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 Toast.makeText(getApplicationContext(),
-                        "Click ListItem Number " + position, Toast.LENGTH_LONG)
+                        "Reproduciendo " + tracks.get(position), Toast.LENGTH_LONG)
                         .show();
-                String rootPath = getExternalFilesDir(Environment.DIRECTORY_MUSIC).toString();
 
-                URLComponents components = new URLComponents(root.getResults().get(position).getPreviewUrl());
-                URL url = null;
-                try {
-                    url = new URL(root.getResults().get(position).getPreviewUrl());
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
-                openLoadAudioFile(url, rootPath);
+
+                openLoadAudioFile(tracks.get(position), root.getResults().get(position).getPreviewUrl());
             }
         });
     }
@@ -122,20 +116,19 @@ public class MainActivity extends AppCompatActivity {
         }));
     }
 
-    public void openLoadAudioFile(URL remoteURL, String destFilename){
-        URLSession.getShared().downloadTask(remoteURL, (localURL, response, error) -> {
-            HTTPURLResponse resp = (HTTPURLResponse) response;
+    public void openLoadAudioFile(String trackName, String url){
+        DownloadManager downloadmanager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+        Uri uri = Uri.parse(url);
 
-            if (error == null){
-                if (resp.getStatusCode() == 200){
-                    File file = new File(localURL.getFile());
+        DownloadManager.Request request = new DownloadManager.Request(uri);
+        request.setTitle("My File");
+        request.setDescription("Downloading");//request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,trackName + ".m4a");
+        downloadmanager.enqueue(request);
+        String fileURl= "/storage/emulated/0/Download/" + trackName + ".m4a";
 
-                    if (file.renameTo(new File(destFilename))){
-                        mediaPlayer = MediaPlayer.create(this, Uri.parse(destFilename));
-                        mediaPlayer.start();
-                    }
-                }
-            }
-        });
+        mediaPlayer = MediaPlayer.create(this, Uri.parse(fileURl));
+        mediaPlayer.start();
+
     }
 }
